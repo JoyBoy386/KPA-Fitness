@@ -1,4 +1,6 @@
-import java.util.ArrayList;//Author:Amir,Adam
+import java.util.ArrayList;
+//Author:Amir,Adam
+//Student Id:24000387,24000263
 
 class FitnessPlan {
     private String name;

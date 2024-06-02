@@ -1,4 +1,6 @@
-public class FitnessPlan { //Author:Amril Najwan
+public class FitnessPlan {
+    //Author:Amril Najwan
+    //Student Id:24000254
     public static void main(String[] args) {
 
         String name = "Ahmad Ali";

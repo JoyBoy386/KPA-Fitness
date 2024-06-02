@@ -1,4 +1,6 @@
-Coach.java// Author:Akid,Amril,Kagen
+Coach.java
+// Author:Akid,Amril,Kagen
+//Student Id:24000336,24000254,24000582
 import java.util.ArrayList; //import arraylist
 import java.util.List; // import list
 

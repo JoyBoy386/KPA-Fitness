@@ -1,4 +1,6 @@
-public class Client {//Author:Adam Haris
+public class Client {
+    //Author:Adam Haris
+    //Student Id:24000263
     private String name;
     private String phoneNumber;
     private String fitnessPlan;

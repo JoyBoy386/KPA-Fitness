@@ -1,4 +1,6 @@
-public class FitnessProgress { //Author Kagen
+public class FitnessProgress {
+    //Author Kagen
+    //Student Id:24000582
     // Fields to store date and scores
     private Date date;
     private double[] scores;
