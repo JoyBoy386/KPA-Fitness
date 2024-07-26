@@ -1,0 +1,208 @@
+package kpa_fitness;
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import java.awt.Color;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.JButton;
+
+public class Main {
+
+    JFrame frame;
+	
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Main window = new Main();
+                    window.frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Create the application.
+     */
+    public Main() {
+        initialize();
+    }
+
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
+        frame = new JFrame();
+        frame.setBounds(100, 100, 862, 692);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create the menu bar
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+
+        // Create each menu item
+        JMenu menuClient = new JMenu("Client");
+        JMenuItem menuItemClient = new JMenuItem("Client");
+        menuItemClient.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose(); // Close the current frame
+                Client clientWindow = new Client(); // Open the Client window
+                clientWindow.getFrame().setVisible(true); // Make the Client window visible
+            }
+        });
+        menuClient.add(menuItemClient);
+        menuBar.add(menuClient);
+
+        JMenu menuFitnessProgress = new JMenu("Fitness Progress");
+        JMenuItem menuItemFitnessProgress = new JMenuItem("Fitness Progress");
+        menuItemFitnessProgress.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose(); // Close the current frame
+                FitnessProgress fitnessprogressWindow = new FitnessProgress(); // Open the Fitness Progress window
+                fitnessprogressWindow.getFrame().setVisible(true); // Make the Fitness Progress window visible
+            }
+        });
+        menuFitnessProgress.add(menuItemFitnessProgress);
+        menuBar.add(menuFitnessProgress);
+
+        JMenu menuFitnessPlan = new JMenu("Fitness Plan");
+        JMenuItem menuItemFitnessPlan = new JMenuItem("Fitness Plan");
+        menuItemFitnessPlan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose(); // Close the current frame
+                FitnessPlan fitnessplanWindow = new FitnessPlan(); // Open the Fitness Plan window
+                fitnessplanWindow.getFrame().setVisible(true); // Make the Fitness Plan window visible
+            }
+        });
+        menuFitnessPlan.add(menuItemFitnessPlan);
+        menuBar.add(menuFitnessPlan);
+
+        JMenu menuCoach = new JMenu("Coach");
+        JMenuItem menuItemCoach = new JMenuItem("Coach");
+        menuItemCoach.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose(); // Close the current frame
+                new Coach(); // Open the Coach window
+            }
+        });
+        menuCoach.add(menuItemCoach);
+        menuBar.add(menuCoach);
+
+        // Create the Logout menu
+        JMenu menuLogout = new JMenu("Logout");
+        JMenuItem menuItemLogout = new JMenuItem("Logout");
+        menuItemLogout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose(); // Close the current frame
+                Login login = new Login(); // Create an instance of Login class
+                login.frame.setVisible(true); // Set the Login frame visible
+            }
+        });
+        menuLogout.add(menuItemLogout);
+        menuBar.add(menuLogout);
+
+        frame.getContentPane().setLayout(null);
+
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(128, 0, 64));
+        panel.setBounds(0, 0, 848, 84);
+        frame.getContentPane().add(panel);
+        panel.setLayout(null);
+
+        JLabel lblNewLabel = new JLabel("Welcome To KPA Fitness");
+        lblNewLabel.setFont(new Font("Tw Cen MT Condensed Extra Bold", Font.PLAIN, 20));
+        lblNewLabel.setBounds(312, 11, 255, 62);
+        panel.add(lblNewLabel);
+
+        // News Section
+        JPanel newsPanel = new JPanel();
+        newsPanel.setBackground(Color.LIGHT_GRAY);
+        newsPanel.setBounds(10, 100, 828, 522);
+        frame.getContentPane().add(newsPanel);
+        newsPanel.setLayout(null);
+
+        JLabel lblNewLabel_1 = new JLabel("Fitness & Gym News");
+        lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 16));
+        lblNewLabel_1.setBounds(10, 11, 200, 25);
+        newsPanel.add(lblNewLabel_1);
+
+        JLabel newsLabel = new JLabel(new ImageIcon(this.getClass().getResource("/img7.jpg")));
+        newsLabel.setText("");
+        newsLabel.setBackground(new Color(0, 0, 0));
+        newsLabel.setForeground(new Color(0, 0, 0));
+        newsLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        newsLabel.setBounds(10, 84, 795, 194);
+        newsPanel.add(newsLabel);
+
+        JLabel lblNewLabel_2 = new JLabel("Gym, fitness operators lose over RM110m since MCO 1.0");
+        lblNewLabel_2.setForeground(new Color(0, 0, 0));
+        lblNewLabel_2.setBounds(20, 47, 597, 26);
+        newsPanel.add(lblNewLabel_2);
+
+        JButton btnNewButton = new JButton("Read More..");
+        btnNewButton.setBackground(new Color(128, 128, 128));
+        btnNewButton.setForeground(new Color(255, 255, 255));
+        btnNewButton.setBounds(653, 50, 120, 23);
+        newsPanel.add(btnNewButton);
+
+        JLabel lblNewLabel_2_1 = new JLabel("Top fitness information");
+        lblNewLabel_2_1.setForeground(Color.BLACK);
+        lblNewLabel_2_1.setBounds(20, 287, 597, 26);
+        newsPanel.add(lblNewLabel_2_1);
+
+        JLabel newsLabel_1 = new JLabel(new ImageIcon(this.getClass().getResource("/img8.jpeg")));
+        newsLabel_1.setText("");
+        newsLabel_1.setForeground(Color.BLACK);
+        newsLabel_1.setFont(new Font("Arial", Font.PLAIN, 14));
+        newsLabel_1.setBackground(Color.BLACK);
+        newsLabel_1.setBounds(10, 317, 795, 194);
+        newsPanel.add(newsLabel_1);
+
+        JButton btnNewButton_1 = new JButton("Read More..");
+        btnNewButton_1.setForeground(Color.WHITE);
+        btnNewButton_1.setBackground(Color.GRAY);
+        btnNewButton_1.setBounds(653, 289, 120, 23);
+        newsPanel.add(btnNewButton_1);
+
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    java.awt.Desktop.getDesktop().browse(new URL("https://themalaysianreserve.com/2021/06/21/gym-fitness-operators-lose-over-rm110m-since-mco-1-0/").toURI());
+                } catch (IOException | URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        btnNewButton_1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    java.awt.Desktop.getDesktop().browse(new URL("https://www.sciencedaily.com/news/health_medicine/fitness/").toURI());
+                } catch (IOException | URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void setVisible(boolean b) {
+        frame.setVisible(b);
+    }
+}
+
