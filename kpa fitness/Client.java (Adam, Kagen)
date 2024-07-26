@@ -1,0 +1,219 @@
+package kpa_fitness;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import java.awt.Color;
+import javax.swing.JPanel;
+import java.awt.Font;
+
+public class Client {
+
+    private JFrame frame;
+    private JTextField textName;
+    private JTextField textPN;
+    private JTextField textAge;
+    private JTextField textWeight;
+    private JTextField textHeight;
+    private JTextField textField;
+    private JTextPane textPane;
+
+    /**
+
+    /**
+     * Create the application.
+     */
+    public Client() {
+        initialize();
+    }
+    
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
+        frame = new JFrame();
+        frame.setBounds(100, 100, 860, 624);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+        
+        JLabel lblName = new JLabel("Name :");
+        lblName.setBounds(30, 84, 64, 25);
+        frame.getContentPane().add(lblName);
+        
+        textName = new JTextField();
+        textName.setBounds(158, 85, 167, 23);
+        frame.getContentPane().add(textName);
+        textName.setColumns(10);
+        
+        JLabel lblPhoneNum = new JLabel("Phone Number :");
+        lblPhoneNum.setBounds(30, 192, 118, 25);
+        frame.getContentPane().add(lblPhoneNum);
+        
+        textPN = new JTextField();
+        textPN.setColumns(10);
+        textPN.setBounds(158, 193, 167, 23);
+        frame.getContentPane().add(textPN);
+        
+        JLabel lblFitPlan = new JLabel("BMI:");
+        lblFitPlan.setBounds(437, 84, 118, 25);
+        frame.getContentPane().add(lblFitPlan);
+        
+        JButton btnSubmit = new JButton("Submit");
+        btnSubmit.setBounds(433, 135, 102, 33);
+        frame.getContentPane().add(btnSubmit);
+        
+        JButton btnClear = new JButton("Clear");
+        btnClear.setBounds(610, 135, 102, 33);
+        frame.getContentPane().add(btnClear);
+        
+        textAge = new JTextField();
+        textAge.setColumns(10);
+        textAge.setBounds(158, 140, 167, 23);
+        frame.getContentPane().add(textAge);
+        
+        JLabel lblAge = new JLabel("Age :");
+        lblAge.setBounds(30, 140, 64, 25);
+        frame.getContentPane().add(lblAge);
+        
+        JLabel lblWeight = new JLabel("Weight (kg) :");
+        lblWeight.setBounds(30, 254, 118, 25);
+        frame.getContentPane().add(lblWeight);
+        
+        textWeight = new JTextField();
+        textWeight.setColumns(10);
+        textWeight.setBounds(158, 256, 167, 23);
+        frame.getContentPane().add(textWeight);
+        
+        JLabel lblHeight = new JLabel("Height (cm) :");
+        lblHeight.setBounds(30, 311, 118, 25);
+        frame.getContentPane().add(lblHeight);
+        
+        textHeight = new JTextField();
+        textHeight.setColumns(10);
+        textHeight.setBounds(158, 313, 167, 23);
+        frame.getContentPane().add(textHeight);
+        
+        textField = new JTextField();
+        textField.setEditable(false);
+        textField.setBounds(487, 85, 209, 23);
+        frame.getContentPane().add(textField);
+        textField.setColumns(10);
+        
+        textPane = new JTextPane();
+        textPane.setEditable(false);
+        textPane.setBounds(30, 341, 764, 201);
+        frame.getContentPane().add(textPane);
+        
+        JButton btnback = new JButton("Back To Main");
+        btnback.setBackground(Color.GRAY);
+        btnback.setBounds(733, 553, 113, 23);
+        frame.getContentPane().add(btnback);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBackground(new Color(128, 0, 64));
+        panel.setBounds(0, 0, 846, 73);
+        frame.getContentPane().add(panel);
+        
+        JLabel lblClientInformation = new JLabel("Client Information");
+        lblClientInformation.setFont(new Font("Tw Cen MT Condensed Extra Bold", Font.PLAIN, 20));
+        lblClientInformation.setBounds(333, 11, 255, 62);
+        panel.add(lblClientInformation);
+        btnback.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                Main main = new Main(); // Create an instance of the Main class
+                main.setVisible(true);
+            }
+        });
+
+        // Add action listener to the Submit button to save data to the database
+        btnSubmit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculateAndSaveData();
+            }
+        });
+
+        // Add action listener to the Clear button to clear the form
+        btnClear.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                clearForm();
+            }
+        });
+    }
+
+    private void calculateAndSaveData() {
+        try {
+            String name = textName.getText();
+            String phoneNumber = textPN.getText();
+            int age = Integer.parseInt(textAge.getText());
+            float weight = Float.parseFloat(textWeight.getText());
+            float height = Float.parseFloat(textHeight.getText()) / 100; // convert height to meters
+            
+            // Calculate BMI
+            float bmi = weight / (height * height);
+            textField.setText(String.format("%.2f", bmi));
+
+            // Save to database
+            Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+            String query = "INSERT INTO clients (name, phone_number, age, weight, height, bmi) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, phoneNumber);
+            preparedStatement.setInt(3, age);
+            preparedStatement.setFloat(4, weight);
+            preparedStatement.setFloat(5, height);
+            preparedStatement.setFloat(6, bmi);
+            preparedStatement.executeUpdate();
+
+            // Display in text pane
+            textPane.setText(textPane.getText() + "Name: " + name + "\n");
+            textPane.setText(textPane.getText() + "Phone Number: " + phoneNumber + "\n");
+            textPane.setText(textPane.getText() + "Age: " + age + "\n");
+            textPane.setText(textPane.getText() + "Weight: " + weight + " kg\n");
+            textPane.setText(textPane.getText() + "Height: " + height * 100 + " cm\n");
+            textPane.setText(textPane.getText() + "BMI: " + bmi + "\n\n");
+
+            // Close connection
+            preparedStatement.close();
+            connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage());
+        }
+    }
+
+    private void clearForm() {
+        textName.setText("");
+        textPN.setText("");
+        textAge.setText("");
+        textWeight.setText("");
+        textHeight.setText("");
+        textField.setText("");
+        textPane.setText("");
+    }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Client();
+            }
+        });
+    }
+}
