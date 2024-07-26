@@ -1,0 +1,304 @@
+package kpa_fitness;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JTable;
+import java.awt.Color;
+import java.awt.Font;
+
+public class FitnessPlan {
+
+    private JFrame frame;
+    private JTextField textField;
+    private JTable table;
+    private JComboBox<String> comboBoxClient;
+    private JComboBox<String> comboBoxWeekStart;
+    private JComboBox<String> comboBoxWeekEnd;
+    private DefaultTableModel tableModel;
+
+
+    /**
+     * Create the application.
+     */
+    public FitnessPlan() {
+        initialize();
+        loadClientNames();
+        loadWeekDates();
+        loadTableData();
+    }
+    
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
+        frame = new JFrame();
+        frame.setBounds(100, 100, 771, 681);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        JButton btnAddPlan = new JButton("Add Plan");
+        btnAddPlan.setBounds(24, 314, 115, 22);
+        frame.getContentPane().add(btnAddPlan);
+        btnAddPlan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                addPlan();
+            }
+        });
+
+        JButton btnRemovePlan = new JButton("Remove Plan");
+        btnRemovePlan.setBounds(24, 347, 119, 22);
+        frame.getContentPane().add(btnRemovePlan);
+        btnRemovePlan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                removePlan();
+            }
+        });
+
+        JButton btnFindPlan = new JButton("Find Plan");
+        btnFindPlan.setBounds(165, 314, 115, 22);
+        frame.getContentPane().add(btnFindPlan);
+        btnFindPlan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                findPlan();
+            }
+        });
+
+        JButton btnPrintPlan = new JButton("Print Plan");
+        btnPrintPlan.setBounds(165, 347, 115, 22);
+        frame.getContentPane().add(btnPrintPlan);
+        btnPrintPlan.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                printPlan();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBackground(new Color(128, 0, 64));
+        panel.setBounds(0, 0, 757, 84);
+        frame.getContentPane().add(panel);
+
+        JLabel lblFitnessplan = new JLabel("Fitness Plan");
+        lblFitnessplan.setFont(new Font("Tw Cen MT Condensed Extra Bold", Font.PLAIN, 20));
+        lblFitnessplan.setBounds(312, 11, 255, 62);
+        panel.add(lblFitnessplan);
+
+        JLabel lblNewLabel = new JLabel("Client Name :");
+        lblNewLabel.setBounds(24, 127, 87, 31);
+        frame.getContentPane().add(lblNewLabel);
+
+        comboBoxClient = new JComboBox<>();
+        comboBoxClient.setBounds(112, 131, 168, 22);
+        frame.getContentPane().add(comboBoxClient);
+
+        JLabel lblNewLabel_1 = new JLabel("Date Start:");
+        lblNewLabel_1.setBounds(24, 185, 76, 14);
+        frame.getContentPane().add(lblNewLabel_1);
+
+        comboBoxWeekStart = new JComboBox<>();
+        comboBoxWeekStart.setBounds(112, 181, 168, 22);
+        frame.getContentPane().add(comboBoxWeekStart);
+
+        JLabel lblNewLabel_1_1 = new JLabel("Date End :");
+        lblNewLabel_1_1.setBounds(24, 228, 76, 14);
+        frame.getContentPane().add(lblNewLabel_1_1);
+
+        comboBoxWeekEnd = new JComboBox<>();
+        comboBoxWeekEnd.setBounds(112, 224, 168, 22);
+        frame.getContentPane().add(comboBoxWeekEnd);
+
+        JLabel lblNewLabel_2 = new JLabel("Objectives :");
+        lblNewLabel_2.setBounds(24, 271, 76, 14);
+        frame.getContentPane().add(lblNewLabel_2);
+
+        textField = new JTextField();
+        textField.setBounds(111, 268, 169, 20);
+        frame.getContentPane().add(textField);
+        textField.setColumns(10);
+
+        tableModel = new DefaultTableModel(new Object[]{"Client Name", "Week Start", "Week End", "Objectives"}, 0);
+        table = new JTable(tableModel);
+        table.setColumnSelectionAllowed(true);
+        table.setCellSelectionEnabled(true);
+        table.setBorder(new LineBorder(new Color(0, 0, 0)));
+        table.setFillsViewportHeight(true);
+        table.setBounds(10, 380, 737, 232);
+        frame.getContentPane().add(table);
+        
+        JButton btnNewButton = new JButton("Back To Main");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+                    frame.dispose();
+                    Main main = new Main(); // Create an instance of the Main class
+                    main.setVisible(true);
+        	}
+        });
+        btnNewButton.setBounds(638, 623, 109, 23);
+        frame.getContentPane().add(btnNewButton);
+    }
+
+    private void loadClientNames() {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+             PreparedStatement psClient = connection.prepareStatement("SELECT name FROM clients");
+             ResultSet rsClient = psClient.executeQuery()) {
+
+            while (rsClient.next()) {
+                comboBoxClient.addItem(rsClient.getString("name"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void loadWeekDates() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date today = new Date();
+        for (int i = 0; i < 52; i++) {
+            String weekDate = dateFormat.format(today);
+            comboBoxWeekStart.addItem(weekDate);
+            comboBoxWeekEnd.addItem(weekDate);
+            today.setTime(today.getTime() - (1000 * 60 * 60 * 24 * 7)); // Go back 1 week each iteration
+        }
+    }
+
+    private void loadTableData() {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+             PreparedStatement psPlan = connection.prepareStatement("SELECT client_name, week_start, week_end, objectives FROM fitness_plans");
+             ResultSet rsPlan = psPlan.executeQuery()) {
+
+            while (rsPlan.next()) {
+                tableModel.addRow(new Object[]{
+                    rsPlan.getString("client_name"),
+                    rsPlan.getDate("week_start"),
+                    rsPlan.getDate("week_end"),
+                    rsPlan.getString("objectives")
+                });
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void addPlan() {
+        String clientName = (String) comboBoxClient.getSelectedItem();
+        String weekStart = (String) comboBoxWeekStart.getSelectedItem();
+        String weekEnd = (String) comboBoxWeekEnd.getSelectedItem();
+        String objectives = textField.getText();
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+             PreparedStatement pstmt = connection.prepareStatement("INSERT INTO fitness_plans (client_name, week_start, week_end, objectives) VALUES (?, ?, ?, ?)")) {
+
+            pstmt.setString(1, clientName);
+            pstmt.setString(2, weekStart);
+            pstmt.setString(3, weekEnd);
+            pstmt.setString(4, objectives);
+            pstmt.executeUpdate();
+
+            tableModel.addRow(new Object[]{clientName, weekStart, weekEnd, objectives});
+            JOptionPane.showMessageDialog(frame, "Plan added successfully!");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Error adding plan: " + ex.getMessage());
+        }
+    }
+
+    private void removePlan() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(frame, "No plan selected to remove.");
+            return;
+        }
+
+        String clientName = (String) tableModel.getValueAt(selectedRow, 0);
+        String weekStart = (String) tableModel.getValueAt(selectedRow, 1);
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+             PreparedStatement pstmt = connection.prepareStatement("DELETE FROM fitness_plans WHERE client_name = ? AND week_start = ?")) {
+
+            pstmt.setString(1, clientName);
+            pstmt.setString(2, weekStart);
+            pstmt.executeUpdate();
+
+            tableModel.removeRow(selectedRow);
+            JOptionPane.showMessageDialog(frame, "Plan removed successfully!");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Error removing plan: " + ex.getMessage());
+        }
+    }
+
+    private void findPlan() {
+        String clientName = (String) comboBoxClient.getSelectedItem();
+
+        tableModel.setRowCount(0); // Clear table
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+             PreparedStatement psPlan = connection.prepareStatement("SELECT client_name, week_start, week_end, objectives FROM fitness_plans WHERE client_name = ?")) {
+
+            psPlan.setString(1, clientName);
+            ResultSet rsPlan = psPlan.executeQuery();
+
+            while (rsPlan.next()) {
+                tableModel.addRow(new Object[]{
+                    rsPlan.getString("client_name"),
+                    rsPlan.getDate("week_start"),
+                    rsPlan.getDate("week_end"),
+                    rsPlan.getString("objectives")
+                });
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Error finding plan: " + ex.getMessage());
+        }
+    }
+
+    private void printPlan() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(frame, "No plan selected to print.");
+            return;
+        }
+
+        String clientName = (String) tableModel.getValueAt(selectedRow, 0);
+        String weekStart = (String) tableModel.getValueAt(selectedRow, 1);
+        String weekEnd = (String) tableModel.getValueAt(selectedRow, 2);
+        String objectives = (String) tableModel.getValueAt(selectedRow, 3);
+
+        String planDetails = String.format("Client Name: %s\nWeek Start: %s\nWeek End: %s\nObjectives: %s",
+                clientName, weekStart, weekEnd, objectives);
+
+        JOptionPane.showMessageDialog(frame, planDetails, "Plan Details", JOptionPane.INFORMATION_MESSAGE);
+    }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new FitnessPlan();
+            }
+        });
+    }
+}
+
+
