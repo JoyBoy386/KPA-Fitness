@@ -1,0 +1,247 @@
+package kpa_fitness;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class FitnessProgress {
+
+    private JFrame frame;
+    private JTextField textFieldScore;
+    private JComboBox<String> comboBoxClient;
+    private JComboBox<String> comboBoxCoach;
+    private JComboBox<String> comboBoxDateIn;
+    private JComboBox<String> comboBoxDateOut;
+    private JTextPane textPane;
+
+
+    /**
+     * Create the application.
+     */
+    public FitnessProgress() {
+        initialize();
+    }
+    
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
+        frame = new JFrame();
+        frame.setBounds(100, 100, 782, 534);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(128, 0, 64));
+        panel.setBounds(0, 0, 768, 82);
+        frame.getContentPane().add(panel);
+        panel.setLayout(null);
+
+        JLabel lblNewLabel = new JLabel("Fitness Progress");
+        lblNewLabel.setBackground(new Color(0, 0, 0));
+        lblNewLabel.setForeground(new Color(0, 0, 0));
+        lblNewLabel.setFont(new Font("Sylfaen", Font.BOLD, 15));
+        lblNewLabel.setBounds(307, 23, 261, 33);
+        panel.add(lblNewLabel);
+
+        textFieldScore = new JTextField();
+        textFieldScore.setColumns(10);
+        textFieldScore.setBounds(155, 328, 96, 20);
+        frame.getContentPane().add(textFieldScore);
+
+        JLabel lblDI = new JLabel("Date In :");
+        lblDI.setBounds(25, 243, 49, 14);
+        frame.getContentPane().add(lblDI);
+
+        JLabel lblDO = new JLabel("Date Out :");
+        lblDO.setBounds(25, 287, 67, 17);
+        frame.getContentPane().add(lblDO);
+
+        JLabel lblSA = new JLabel("Score/Achieve :");
+        lblSA.setBounds(25, 330, 85, 17);
+        frame.getContentPane().add(lblSA);
+
+        JButton btnBack = new JButton("Back To Main");
+        btnBack.setForeground(new Color(0, 0, 0));
+        btnBack.setBackground(new Color(192, 192, 192));
+        btnBack.setBounds(659, 463, 109, 23);
+        frame.getContentPane().add(btnBack);
+
+        textPane = new JTextPane();
+        textPane.setEditable(false);
+        textPane.setBounds(311, 164, 421, 183);
+        frame.getContentPane().add(textPane);
+
+        JLabel lblCN = new JLabel("Client Name:");
+        lblCN.setBounds(25, 164, 67, 14);
+        frame.getContentPane().add(lblCN);
+
+        JLabel lblCN2 = new JLabel("Coach Name : ");
+        lblCN2.setBounds(25, 202, 85, 14);
+        frame.getContentPane().add(lblCN2);
+
+        comboBoxClient = new JComboBox<>();
+        comboBoxClient.setBounds(155, 164, 96, 22);
+        frame.getContentPane().add(comboBoxClient);
+
+        comboBoxCoach = new JComboBox<>();
+        comboBoxCoach.setBounds(155, 198, 96, 22);
+        frame.getContentPane().add(comboBoxCoach);
+
+        comboBoxDateIn = new JComboBox<>(getDates());
+        comboBoxDateIn.setBounds(155, 239, 96, 22);
+        frame.getContentPane().add(comboBoxDateIn);
+
+        comboBoxDateOut = new JComboBox<>(getDates());
+        comboBoxDateOut.setBounds(155, 284, 96, 22);
+        frame.getContentPane().add(comboBoxDateOut);
+
+        JButton btnSubmit = new JButton("Submit");
+        btnSubmit.setBounds(321, 368, 89, 23);
+        frame.getContentPane().add(btnSubmit);
+
+        JButton btnClear = new JButton("Clear");
+        btnClear.setBounds(643, 368, 89, 23);
+        frame.getContentPane().add(btnClear);
+
+        // Action listeners
+        btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                Main main = new Main(); // Create an instance of the Main class
+                main.setVisible(true);
+            }
+        });
+
+        btnSubmit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                submitData();
+            }
+        });
+
+        btnClear.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                clearForm();
+            }
+        });
+
+        // Load client and coach names from the database
+        loadNames();
+    }
+
+    private void loadNames() {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+            
+            // Load client names
+            PreparedStatement psClient = connection.prepareStatement("SELECT name FROM clients");
+            ResultSet rsClient = psClient.executeQuery();
+            while (rsClient.next()) {
+                comboBoxClient.addItem(rsClient.getString("name"));
+            }
+            rsClient.close();
+            psClient.close();
+            
+            // Load coach names
+            PreparedStatement psCoach = connection.prepareStatement("SELECT name FROM coaches"); // Adjust table and column names as needed
+            ResultSet rsCoach = psCoach.executeQuery();
+            while (rsCoach.next()) {
+                comboBoxCoach.addItem(rsCoach.getString("name"));
+            }
+            rsCoach.close();
+            psCoach.close();
+            
+            connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage());
+        }
+    }
+
+    private String[] getDates() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String[] dates = new String[365];
+        Date today = new Date();
+        for (int i = 0; i < 365; i++) {
+            dates[i] = dateFormat.format(today);
+            today.setTime(today.getTime() - (1000 * 60 * 60 * 24)); // Go back 1 day each iteration
+        }
+        return dates;
+    }
+
+    private void submitData() {
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        try {
+            String clientName = (String) comboBoxClient.getSelectedItem();
+            String coachName = (String) comboBoxCoach.getSelectedItem();
+            String dateIn = (String) comboBoxDateIn.getSelectedItem();
+            String dateOut = (String) comboBoxDateOut.getSelectedItem();
+            String score = textFieldScore.getText();
+
+            // Connect to the database
+            connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+
+            // Prepare and execute SQL insert statement
+            String sql = "INSERT INTO fitness_progress (client_name, coach_name, date_in, date_out, score) VALUES (?, ?, ?, ?, ?)";
+            pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, clientName);
+            pstmt.setString(2, coachName);
+            pstmt.setString(3, dateIn);
+            pstmt.setString(4, dateOut);
+            pstmt.setString(5, score);
+            pstmt.executeUpdate();
+
+            // Display success message
+            JOptionPane.showMessageDialog(frame, "Data submitted successfully!");
+
+            // Display in text pane
+            textPane.setText("Client Name: " + clientName + "\n");
+            textPane.setText(textPane.getText() + "Coach Name: " + coachName + "\n");
+            textPane.setText(textPane.getText() + "Date In: " + dateIn + "\n");
+            textPane.setText(textPane.getText() + "Date Out: " + dateOut + "\n");
+            textPane.setText(textPane.getText() + "Score/Achieve: " + score + "\n");
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage());
+        } finally {
+            // Close resources
+            try {
+                if (pstmt != null) pstmt.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void clearForm() {
+        comboBoxClient.setSelectedIndex(0);
+        comboBoxCoach.setSelectedIndex(0);
+        comboBoxDateIn.setSelectedIndex(0);
+        comboBoxDateOut.setSelectedIndex(0);
+        textFieldScore.setText("");
+        textPane.setText("");
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new FitnessProgress();
+            }
+        });
+    }
+}
