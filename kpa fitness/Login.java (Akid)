@@ -1,0 +1,136 @@
+package kpa_fitness;
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.JFrame;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JPanel;
+import java.awt.Color;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.JOptionPane;
+
+public class Login {
+
+    JFrame frame;
+    private JTextField textField_1;
+    private JPasswordField passwordField;
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Login window = new Login();
+                    window.frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Create the application.
+     */
+    public Login() {
+        initialize();
+    }
+
+    /**
+     * Initialize the contents of the frame.
+     */
+    private void initialize() {
+        frame = new JFrame();
+        frame.getContentPane().setEnabled(true);
+        frame.setBounds(100, 100, 735, 380);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        textField_1 = new JTextField();
+        textField_1.setBounds(188, 111, 155, 41);
+        textField_1.setColumns(10);
+
+        passwordField = new JPasswordField();
+        passwordField.setBounds(188, 181, 155, 41);
+
+        JPanel panel = new JPanel();
+        panel.setBounds(0, 0, 721, 74);
+        panel.setBackground(new Color(128, 0, 64));
+        panel.setLayout(null);
+
+        JLabel lblNewLabel_1 = new JLabel("KPA FITNESS");
+        lblNewLabel_1.setBounds(270, 11, 209, 37);
+        lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 30));
+        lblNewLabel_1.setBackground(new Color(255, 255, 255));
+        panel.add(lblNewLabel_1);
+
+        JButton btnNewButton = new JButton("Cancel");
+        btnNewButton.setBounds(233, 233, 110, 35);
+
+        JButton btnLogin = new JButton("Login");
+        btnLogin.setBounds(72, 233, 110, 35);
+        
+        // Add ActionListener to the "Login" button
+        btnLogin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                authenticateUser();
+            }
+        });
+
+        JLabel lblUsername = new JLabel("Username");
+        lblUsername.setBounds(62, 119, 87, 24);
+
+        JLabel lblPassword = new JLabel("Password");
+        lblPassword.setBounds(62, 194, 87, 24);
+
+        JLabel lblimg = new JLabel(new ImageIcon(this.getClass().getResource("/img6.png")));
+        lblimg.setBounds(374, 83, 337, 249);
+        frame.getContentPane().setLayout(null);
+        frame.getContentPane().add(textField_1);
+        frame.getContentPane().add(passwordField);
+        frame.getContentPane().add(panel);
+        frame.getContentPane().add(btnNewButton);
+        frame.getContentPane().add(btnLogin);
+        frame.getContentPane().add(lblUsername);
+        frame.getContentPane().add(lblPassword);
+        frame.getContentPane().add(lblimg);
+    }
+
+    private void authenticateUser() {
+        String username = textField_1.getText();
+        String password = new String(passwordField.getPassword());
+
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://sql12.freesqldatabase.com:3306/sql12720084", "sql12720084", "QJFIkNEZxE");
+            String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement pst = connection.prepareStatement(query);
+            pst.setString(1, username);
+            pst.setString(2, password);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                frame.dispose(); // Close the current frame
+                Main main = new Main(); // Create an instance of Main class
+                main.setVisible(true); // Set the Main frame visible
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid username or password.");
+            }
+            rs.close();
+            pst.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Database connection error.");
+        }
+    }
+}
